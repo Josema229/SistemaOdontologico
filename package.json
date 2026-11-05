@@ -1,0 +1,30 @@
+{
+  "name": "dentalcare",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "eslint .",
+    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "db:migrate": "node scripts/migrate.js",
+    "db:seed": "node scripts/seed.js",
+    "user:create": "node scripts/create-user.js",
+    "db:backup": "node scripts/backup.js"
+  },
+  "dependencies": {
+    "next": "^16.0.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "better-sqlite3": "^12.4.1",
+    "server-only": "^0.0.1"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.1.0",
+    "@tailwindcss/postcss": "^4.1.0",
+    "eslint": "^9.39.0",
+    "eslint-config-next": "^16.0.0"
+  }
+}

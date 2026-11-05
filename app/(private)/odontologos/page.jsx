@@ -1,0 +1,13 @@
+import Link from 'next/link';
+import { database, requireUser } from '../../../lib/server.js';
+import { dentistsWithAvailability, referenceData } from '../../../lib/services.js';
+import { PageTitle, Icon, Empty } from '../../../components/ui.jsx';
+const days = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+export default async function Dentists() {
+  const user = await requireUser('recepcionista'), db = database();
+  const dentists = dentistsWithAvailability(db, user), { branches } = referenceData(db, user);
+  return <><PageTitle eyebrow="El equipo DentalCare" title="Odontólogos" description="Profesionales, sucursales y disponibilidad semanal."><Link href="/odontologos/nuevo" className="btn"><Icon name="plus"/>Agregar profesional</Link></PageTitle>
+    {!dentists.length ? <div className="panel"><Empty title="Sin profesionales registrados" text="Agrega un odontólogo y define sus horarios para comenzar a agendar."/></div> : <div className="grid items-start gap-5 xl:grid-cols-2">{dentists.map(d => <article key={d.id} className="panel overflow-hidden"><div className="flex items-start gap-4 border-b border-[#e5ece8] p-6"><div className="rounded-xl bg-[#eaf4ef] p-3 text-brand"><Icon name="tooth" className="h-6 w-6"/></div><div className="flex-1"><h2 className="text-lg font-semibold">{d.name}</h2><p className="muted mt-1">{d.specialty}</p><p className={`mt-2 text-xs ${d.active ? 'text-brand' : 'text-muted'}`}>{d.active ? '● Activo' : '○ Inactivo'} · Profesional #{d.id}</p></div><Link href={`/odontologos/${d.id}`} className="text-sm font-semibold text-brand">Editar</Link></div><div className="p-6"><p className="eyebrow mb-3">Sucursales asignadas</p><div className="mb-5 flex flex-wrap gap-2">{d.branches.map(b => <span key={b} className="rounded-md bg-[#f0f5f2] px-2.5 py-1.5 text-xs text-muted">{branches.find(branch => branch.id === b)?.name}</span>)}</div><p className="eyebrow mb-3">Disponibilidad semanal</p>{d.availability.length ? <div className="max-h-72 space-y-2 overflow-y-auto">{d.availability.map(b => <div key={b.id} className="flex flex-wrap justify-between gap-2 rounded-md bg-[#fafcfb] px-3 py-2 text-xs"><span className="w-8 font-semibold">{days[b.weekday]}</span><span>{b.start_time} – {b.end_time}</span><span className="ml-auto text-muted">{branches.find(branch => branch.id === b.branch_id)?.name}</span></div>)}</div> : <p className="muted">Sin bloques de disponibilidad.</p>}</div></article>)}</div>}
+    <p className="muted mt-6">Las cuentas de acceso se crean mediante el comando documentado en README. Desactivar un profesional conserva sus registros.</p>
+  </>;
+}

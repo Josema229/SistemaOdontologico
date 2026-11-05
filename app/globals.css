@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #183e43;
+  --color-muted: #667c80;
+  --color-brand: #177b75;
+  --color-brand-dark: #105b57;
+  --font-sans: Arial, Helvetica, sans-serif;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: #f5f8f8; color: #183e43; font-size: 14px; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, a { touch-action: manipulation; }
+button { cursor: pointer; }
+button:disabled { cursor: wait; opacity: .6; }
+a { text-decoration: none; }
+:focus-visible { outline: 3px solid #58b6a8; outline-offset: 3px; }
+input, select, textarea { width: 100%; border: 1px solid #cfdddd; border-radius: 9px; padding: 10px 12px; background: #fff; color: #183e43; min-height: 42px; }
+textarea { min-height: 110px; resize: vertical; }
+input[type="checkbox"] { width: 18px; min-height: 18px; accent-color: #177b75; }
+label { display: block; font-size: 13px; font-weight: 600; }
+label > input, label > select, label > textarea { margin-top: 7px; font-weight: normal; }
+h1, h2, h3, p { margin: 0; }
+table { width: 100%; border-collapse: collapse; text-align: left; white-space: nowrap; }
+th { padding: 14px 20px; background: #f8fafa; color: #718588; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; font-weight: 600; }
+td { padding: 18px 20px; border-top: 1px solid #edf1f1; }
+tbody tr:hover { background: #fafdfc; }
+@layer components {
+  .panel { @apply rounded-2xl border border-[#e0e9e8] bg-white; box-shadow: 0 3px 12px #183e4303; }
+  .btn { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-dark; }
+  .btn-light { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-[#d7e3e1] bg-white px-4 py-2.5 text-sm font-semibold text-ink transition hover:bg-[#eef6f4]; }
+  .btn-danger { @apply inline-flex min-h-10 items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100; }
+  .field-grid { @apply grid gap-5 sm:grid-cols-2; }
+  .eyebrow { @apply text-[11px] font-semibold uppercase tracking-[.12em] text-muted; }
+  .muted { @apply text-sm leading-relaxed text-muted; }
+}
+@media (max-width: 767px) { td,th { padding: 14px; } }

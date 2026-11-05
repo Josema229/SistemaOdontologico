@@ -1,0 +1,9 @@
+import { redirect } from 'next/navigation';
+import { currentUser } from '../../lib/server.js';
+import { Brand, Icon } from '../../components/ui.jsx';
+import { LoginForm } from '../../components/forms.jsx';
+export const dynamic = 'force-dynamic';
+export default async function LoginPage() {
+  if (await currentUser()) redirect('/');
+  return <main className="flex min-h-screen"><section className="hidden w-[45%] flex-col justify-between bg-[#164e4b] p-14 text-white lg:flex"><div className="flex items-center gap-3"><Icon name="tooth" className="h-9 w-9"/><span className="text-2xl font-bold">DentalCare</span></div><div><p className="mb-5 text-xs uppercase tracking-[.2em] text-[#a5d1c3]">Cuidar empieza por organizar</p><h1 className="max-w-md text-5xl leading-tight font-semibold tracking-tight">Más tiempo para<br/>cada sonrisa.</h1><p className="mt-6 max-w-sm text-base leading-7 text-[#bad5ce]">La agenda, los pacientes y la información que tu equipo necesita, en un mismo lugar.</p><div className="mt-10 flex items-center gap-3 text-sm text-[#d2e5de]"><span className="rounded-xl border border-[#608984] p-3"><Icon name="calendar"/></span>Tres sucursales. Un equipo conectado.</div></div><p className="text-xs text-[#9ec1b8]">Presidente Franco · Ciudad del Este · Hernandarias</p></section><section className="flex flex-1 flex-col items-center justify-center px-6 py-12"><div className="w-full max-w-sm"><div className="mb-12"><Brand/></div><p className="eyebrow mb-3">Bienvenido a tu espacio de trabajo</p><h2 className="text-3xl font-bold tracking-tight">Iniciar sesión</h2><p className="muted mb-8 mt-3">Ingresa con la cuenta que te asignó el equipo.</p><LoginForm/><p className="muted mt-8 border-t border-[#e0e8e5] pt-6 text-xs">Acceso exclusivo para recepción y odontólogos.<br/>Si necesitas una cuenta, contacta al responsable del sistema.</p></div></section></main>;
+}

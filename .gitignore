@@ -1,0 +1,13 @@
+node_modules/
+.npm-cache/
+.next/
+.env*
+!.env.example
+data/
+backups/
+*.sqlite
+*.sqlite-*
+*.db
+*.db-*
+test-results/
+*.log

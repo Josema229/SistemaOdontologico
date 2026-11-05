@@ -1,0 +1,21 @@
+import Link from 'next/link';
+import { notFound } from 'next/navigation';
+import { database, requireUser } from '../../../../lib/server.js';
+import { appointmentDetail } from '../../../../lib/services.js';
+import { localNow } from '../../../../lib/time.js';
+import { PageTitle, Badge, formatDate, formatInstant } from '../../../../components/ui.jsx';
+import { ActionButton } from '../../../../components/forms.jsx';
+export default async function Appointment({ params }) {
+  const user = await requireUser(), { id } = await params;
+  let detail; try { detail = appointmentDetail(database(), user, id); } catch (e) { if (e.status) notFound(); throw e; }
+  const { appointment: a, changes, visit } = detail, now = localNow();
+  const ended = `${a.date} ${a.end_time}` <= `${now.date} ${now.time}`;
+  const started = `${a.date} ${a.start_time}` <= `${now.date} ${now.time}`;
+  return <><PageTitle eyebrow={`Agenda · Turno #${a.id}`} title="Detalle del turno" description={`${formatDate(a.date)} · ${a.start_time} a ${a.end_time}`}><Badge status={a.status}/></PageTitle>
+    <div className="grid items-start gap-6 xl:grid-cols-[1.6fr_1fr]"><section className="panel p-6 sm:p-8"><div className="grid gap-6 sm:grid-cols-2"><div><p className="eyebrow">Paciente</p><Link href={`/pacientes/${a.patient_id}`} className="mt-2 inline-block text-lg font-semibold text-brand">{a.patient_name}</Link></div><div><p className="eyebrow">Odontólogo</p><p className="mt-2 font-semibold">{a.dentist_name}</p></div><div><p className="eyebrow">Sucursal</p><p className="mt-2">{a.branch_name}</p></div><div><p className="eyebrow">Fecha y horario</p><p className="mt-2">{formatDate(a.date)}<br/>{a.start_time} – {a.end_time}</p></div></div><div className="mt-6 border-t border-[#e5ece8] pt-6"><p className="eyebrow mb-3">Tratamiento o motivo</p><p className="leading-6">{a.reason}</p></div><p className="mt-6 text-xs text-muted">Horario expresado en America/Asuncion.</p></section>
+      <aside className="panel space-y-4 p-6"><h2 className="font-semibold">Acciones del turno</h2>{a.status === 'programado' ? user.role === 'recepcionista' ? <><Link href={`/turnos/${id}/reprogramar`} className="btn w-full">Reprogramar turno</Link><ActionButton url={`/api/appointments/${id}/status`} body={{ status: 'cancelado' }} label="Cancelar turno" danger confirmation={`¿Cancelar el turno de ${a.patient_name} del ${formatDate(a.date)} a las ${a.start_time}? Se conservará el registro y se liberará el horario.`}/>{ended ? <ActionButton url={`/api/appointments/${id}/status`} body={{ status: 'ausente' }} label="Registrar inasistencia" confirmation="¿Marcar este turno como ausente? No se generará una atención clínica."/> : <p className="muted text-xs">La inasistencia podrá registrarse después de las {a.end_time} del día del turno.</p>}</> : started ? <Link href={`/turnos/${id}/atencion`} className="btn">Registrar atención</Link> : <p className="muted">Podrás registrar la atención cuando comience el turno.</p> : <p className="muted">Este turno está {a.status}. Sus datos se conservan y no se permiten nuevos cambios de estado.</p>}<Link href="/agenda" className="inline-block text-sm font-semibold text-brand">← Volver a la agenda</Link></aside>
+    </div>
+    {visit && <section className="panel mt-6 p-6"><h2 className="mb-2 font-semibold">Atención registrada · {formatInstant(visit.attended_at)}</h2><p className="whitespace-pre-wrap leading-7">{visit.treatment}</p>{(visit.next_date || visit.next_procedure) && <p className="muted mt-4">Seguimiento: {visit.next_date ? formatDate(visit.next_date) : 'Sin fecha'} · {visit.next_procedure || 'Sin procedimiento previsto'}. Esta referencia no reserva un turno.</p>}</section>}
+    <section className="mt-8"><h2 className="mb-4 text-lg font-bold">Registro de reprogramaciones</h2>{changes.length ? <div className="panel overflow-x-auto"><table><thead><tr><th>Anterior</th><th>Nuevo</th><th>Responsable</th><th>Modificado</th></tr></thead><tbody>{changes.map(c => <tr key={c.id}><td>{formatDate(c.old_date)}<br/>{c.old_start} – {c.old_end}</td><td>{formatDate(c.new_date)}<br/>{c.new_start} – {c.new_end}</td><td>{c.user_name}</td><td>{formatInstant(c.changed_at)}</td></tr>)}</tbody></table></div> : <p className="muted">El turno no tiene reprogramaciones registradas.</p>}</section>
+  </>;
+}
