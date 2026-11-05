@@ -11,3 +11,5 @@ backups/
 *.db-*
 test-results/
 *.log
+
+.runtime/
