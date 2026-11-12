@@ -6,7 +6,7 @@ import { PageTitle, Icon, AppointmentTable, formatDate } from '../../components/
 
 export default async function Dashboard() {
   const user = await requireUser(); const today = localNow();
-  const appointments = listAppointments(database(), user, { date: today.date });
+  const appointments = (await listAppointments(database(), user, { date: today.date }));
   const metrics = [ ['Turnos del día', appointments.length, 'calendar', 'bg-[#f5e5d9] text-[#996448]'], ['Programados', appointments.filter(a => a.status === 'programado').length, 'clock', 'bg-[#edf0e5] text-[#62794e]'], ['Atendidos', appointments.filter(a => a.status === 'atendido').length, 'check', 'bg-[#eee9f5] text-[#7a6596]'], ['Ausentes', appointments.filter(a => a.status === 'ausente').length, 'people', 'bg-[#f6ecd9] text-[#8a703c]'] ];
   const next = appointments.find(a => a.status === 'programado' && a.start_time > today.time);
   return <>

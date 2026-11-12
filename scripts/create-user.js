@@ -9,7 +9,7 @@ const args = Object.fromEntries(process.argv.slice(2).map(arg => {
 const db = openDatabase();
 try {
   // El secreto se proporciona por entorno para no almacenarlo en el historial de comandos.
-  const userId = createUser(db, { ...args, dentist_id: args.dentist, password: process.env.DENTALCARE_USER_PASSWORD });
+  const userId = await createUser(db, { ...args, dentist_id: args.dentist, password: process.env.DENTALCARE_USER_PASSWORD });
   console.log(`Usuario creado: #${userId} (${args.role}).`);
 } catch (error) { console.error(error.message); process.exitCode = 1; }
-finally { db.close(); }
+finally { await db.end(); }

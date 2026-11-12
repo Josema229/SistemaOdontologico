@@ -30,4 +30,13 @@ export function AppointmentTable({ appointments, showDate = false }) {
   return <div className="overflow-x-auto"><table><thead><tr>{showDate && <th>Fecha</th>}<th>Horario</th><th>Paciente</th><th>Odontólogo / sucursal</th><th>Motivo</th><th>Estado</th><th><span className="sr-only">Detalle</span></th></tr></thead><tbody>{appointments.map(a => <tr key={a.id}>{showDate && <td>{formatDate(a.date)}</td>}<td><span className="font-semibold">{a.start_time}</span><span className="mt-1 block text-xs text-muted">hasta {a.end_time}</span></td><td><Link href={`/pacientes/${a.patient_id}`} className="font-semibold hover:text-brand">{a.patient_name}</Link><span className="mt-1 block text-xs text-muted">Turno #{String(a.id).padStart(3, '0')}</span></td><td>{a.dentist_name}<span className="mt-1 block text-xs text-muted">{a.branch_name}</span></td><td className="max-w-48 truncate" title={a.reason}>{a.reason}</td><td><Badge status={a.status}/></td><td><Link href={`/turnos/${a.id}`} className="inline-flex items-center gap-1 text-xs font-semibold text-brand">Ver turno<Icon name="arrow" className="h-4 w-4"/></Link></td></tr>)}</tbody></table></div>;
 }
 export function formatDate(date) { return new Intl.DateTimeFormat('es-PY', { timeZone: 'America/Asuncion', day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(date + 'T12:00:00Z')); }
-export function formatInstant(value) { return new Intl.DateTimeFormat('es-PY', { timeZone: 'America/Asuncion', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value.replace(' ', 'T') + 'Z')); }
+export function formatInstant(value) {
+  let instant = value;
+  if (!(value instanceof Date)) {
+    const timestamp = value.replace(' ', 'T');
+    instant = new Date(/(?:Z|[+-]\d{2}:\d{2})$/.test(timestamp) ? timestamp : timestamp + 'Z');
+  }
+  return new Intl.DateTimeFormat('es-PY', {
+    timeZone: 'America/Asuncion', dateStyle: 'medium', timeStyle: 'short',
+  }).format(instant);
+}

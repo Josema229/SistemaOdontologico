@@ -6,7 +6,7 @@ import { PageTitle, AppointmentTable, Empty, formatInstant, formatDate } from '.
 import { ActionButton } from '../../../../components/forms.jsx';
 export default async function Patient({ params }) {
   const user = await requireUser(); const { id } = await params;
-  let detail; try { detail = patientDetail(database(), user, id); } catch (error) { if ([400, 403, 404].includes(error.status)) notFound(); throw error; }
+  let detail; try { detail = (await patientDetail(database(), user, id)); } catch (error) { if ([400, 403, 404].includes(error.status)) notFound(); throw error; }
   const { patient: p, appointments, visits } = detail;
   return <><PageTitle eyebrow="Ficha del paciente" title={`${p.first_name} ${p.last_name}`} description={`Cédula ${p.identity_number}`}>{user.role === 'recepcionista' && <div className="flex gap-3"><Link href={`/pacientes/${id}/editar`} className="btn-light">Editar datos</Link><Link href={`/turnos/nuevo?patient_id=${id}`} className="btn">Agendar turno</Link></div>}</PageTitle>
     <div className="panel mb-7 grid gap-5 p-6 sm:grid-cols-3"><div><p className="eyebrow">Cédula</p><p className="mt-2 font-semibold">{p.identity_number}</p></div><div><p className="eyebrow">Teléfono</p><p className="mt-2 font-semibold">{p.phone || 'Sin teléfono registrado'}</p></div><div><p className="eyebrow">Odontólogo asignado</p><p className="mt-2 font-semibold">{p.dentist_name || 'Sin asignar'}</p></div></div>

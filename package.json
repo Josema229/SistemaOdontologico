@@ -8,23 +8,24 @@
     "build": "next build",
     "start": "next start --hostname 0.0.0.0",
     "lint": "eslint .",
-    "test": "node --test --test-concurrency=1 tests/*.test.js",
+    "test": "node --env-file-if-exists=.env --test --test-concurrency=1 tests/*.test.js",
     "db:migrate": "node scripts/migrate.js",
     "db:seed": "node scripts/seed.js",
     "user:create": "node scripts/create-user.js",
     "db:backup": "node scripts/backup.js"
   },
   "dependencies": {
+    "better-sqlite3": "^12.4.1",
     "next": "^16.0.0",
+    "pg": "^8.23.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "better-sqlite3": "^12.4.1",
     "server-only": "^0.0.1"
   },
   "devDependencies": {
-    "tailwindcss": "^4.1.0",
     "@tailwindcss/postcss": "^4.1.0",
     "eslint": "^9.39.0",
-    "eslint-config-next": "^16.0.0"
+    "eslint-config-next": "^16.0.0",
+    "tailwindcss": "^4.1.0"
   }
 }

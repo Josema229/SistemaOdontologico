@@ -23,7 +23,7 @@ async function handle(request, context) {
     }
     const jar = await cookies();
     if (resource === 'login' && path.length === 1 && method === 'POST') {
-      const token = login(db, input.email, input.password);
+      const token = await login(db, input.email, input.password);
       const secure = process.env.COOKIE_SECURE === 'true' || process.env.APP_ORIGIN?.startsWith('https://');
       jar.set('dentalcare_session', token, { httpOnly: true, sameSite: 'lax', secure: Boolean(secure), path: '/', maxAge: 8 * 3600 });
       return json({ ok: true });
@@ -31,29 +31,29 @@ async function handle(request, context) {
     const actor = await currentUser();
     service.authorized(actor);
     if (resource === 'logout' && path.length === 1 && method === 'POST') {
-      logout(db, jar.get('dentalcare_session')?.value);
+      await logout(db, jar.get('dentalcare_session')?.value);
       jar.delete('dentalcare_session');
       return json({ ok: true });
     }
     const filters = Object.fromEntries(new URL(request.url).searchParams);
     if (resource === 'patients') {
-      if (method === 'GET') return json(recordId ? service.patientDetail(db, actor, recordId) : service.listPatients(db, actor, filters.q));
-      if (method === 'POST' && !recordId) return json(service.savePatient(db, actor, input), 201);
-      if (method === 'PUT' && recordId) return json(service.savePatient(db, actor, input, recordId));
-      if (method === 'DELETE' && recordId) return json(service.deletePatient(db, actor, recordId));
+      if (method === 'GET') return json(recordId ? (await service.patientDetail(db, actor, recordId)) : (await service.listPatients(db, actor, filters.q)));
+      if (method === 'POST' && !recordId) return json((await service.savePatient(db, actor, input)), 201);
+      if (method === 'PUT' && recordId) return json((await service.savePatient(db, actor, input, recordId)));
+      if (method === 'DELETE' && recordId) return json((await service.deletePatient(db, actor, recordId)));
     }
     if (resource === 'dentists') {
-      if (method === 'GET') return json(service.dentistsWithAvailability(db, actor));
-      if (method === 'POST' && !recordId) return json(service.saveDentist(db, actor, input), 201);
-      if (method === 'PUT' && recordId) return json(service.saveDentist(db, actor, input, recordId));
+      if (method === 'GET') return json((await service.dentistsWithAvailability(db, actor)));
+      if (method === 'POST' && !recordId) return json((await service.saveDentist(db, actor, input)), 201);
+      if (method === 'PUT' && recordId) return json((await service.saveDentist(db, actor, input, recordId)));
     }
-    if (resource === 'availability' && method === 'GET') return json(service.availableSlots(db, actor, filters));
+    if (resource === 'availability' && method === 'GET') return json((await service.availableSlots(db, actor, filters)));
     if (resource === 'appointments') {
-      if (method === 'GET') return json(recordId ? service.appointmentDetail(db, actor, recordId) : service.listAppointments(db, actor, filters));
-      if (method === 'POST' && !recordId) return json(service.createAppointment(db, actor, input), 201);
-      if (method === 'POST' && recordId && action === 'reschedule') return json(service.rescheduleAppointment(db, actor, recordId, input));
-      if (method === 'POST' && recordId && action === 'status') return json(service.changeStatus(db, actor, recordId, input.status));
-      if (method === 'POST' && recordId && action === 'visit') return json(service.recordVisit(db, actor, recordId, input));
+      if (method === 'GET') return json(recordId ? (await service.appointmentDetail(db, actor, recordId)) : (await service.listAppointments(db, actor, filters)));
+      if (method === 'POST' && !recordId) return json((await service.createAppointment(db, actor, input)), 201);
+      if (method === 'POST' && recordId && action === 'reschedule') return json((await service.rescheduleAppointment(db, actor, recordId, input)));
+      if (method === 'POST' && recordId && action === 'status') return json((await service.changeStatus(db, actor, recordId, input.status)));
+      if (method === 'POST' && recordId && action === 'visit') return json((await service.recordVisit(db, actor, recordId, input)));
     }
     throw new AppError('Operación no encontrada.', 404);
   } catch (error) {

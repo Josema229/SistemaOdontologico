@@ -7,7 +7,7 @@ import { PageTitle, Badge, formatDate, formatInstant } from '../../../../compone
 import { ActionButton } from '../../../../components/forms.jsx';
 export default async function Appointment({ params }) {
   const user = await requireUser(), { id } = await params;
-  let detail; try { detail = appointmentDetail(database(), user, id); } catch (e) { if (e.status) notFound(); throw e; }
+  let detail; try { detail = (await appointmentDetail(database(), user, id)); } catch (e) { if (e.status) notFound(); throw e; }
   const { appointment: a, changes, visit } = detail, now = localNow();
   const ended = `${a.date} ${a.end_time}` <= `${now.date} ${now.time}`;
   const started = `${a.date} ${a.start_time}` <= `${now.date} ${now.time}`;
